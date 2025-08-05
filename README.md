@@ -14,19 +14,22 @@ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=i
 [...]
 ```
 
-Check Sentry Cocoa bundle version (8.39.0):
+Check Sentry Cocoa bundle version (expected 8.39.0):
 ```sh
-plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist
+plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist | grep CFBundleVersion -A1
+
+        <key>CFBundleVersion</key>
+        <string>8.39.0</string>
 ```
 
 Next, upgrade `Sentry.Maui` to `[5.6.0]`:
 ```sh
-dotnet add package Sentry.Maui --version "[5.6.0]"
+$ dotnet add package Sentry.Maui --version "[5.6.0]"
 ```
 
 Finally, try building and running the app _without cleaning_ the intermediate output directory:
 ```sh
-dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=iossimulator-arm64 /p:_DeviceName=:v2:udid=<DeviceId>
+$ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=iossimulator-arm64 /p:_DeviceName=:v2:udid=<DeviceId>
 [...]
   SentryMauiApp net9.0-ios18.0 failed with 1 error(s) (652.1s) → bin/Release/net9.0-ios18.0/iossimulator-arm64/SentryMauiApp.dll
     /usr/local/share/dotnet/packs/Microsoft.iOS.Sdk.net9.0_18.0/18.0.9617/targets/Xamarin.Shared.Sdk.targets(1663,3): error :
@@ -42,7 +45,10 @@ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=i
 Build failed with 1 error(s) in 652.2s
 ```
 
-Also, check Sentry Cocoa bundle version (expected 8.46.0, actual 8.39.0):
+Also, check Sentry Cocoa bundle version (expected 8.46.0):
 ```sh
-plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist
+$ plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist | grep CFBundleVersion -A1
+
+        <key>CFBundleVersion</key>
+        <string>8.39.0</string>
 ```
