@@ -14,7 +14,7 @@ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=i
 [...]
 ```
 
-Check Sentry Cocoa bundle version (8.39):
+Check Sentry Cocoa bundle version (8.39.0):
 ```sh
 plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist
 ```
@@ -42,7 +42,7 @@ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=i
 Build failed with 1 error(s) in 652.2s
 ```
 
-Check Sentry Cocoa bundle version (still 8.39):
+Also, check Sentry Cocoa bundle version (expected 8.46.0, actual 8.39.0):
 ```sh
 plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist
 ```
