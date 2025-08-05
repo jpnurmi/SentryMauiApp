@@ -7,7 +7,16 @@ on:
 
 jobs:
   ios:
+    name: Sentry ${{ matrix.from }} -> ${{ matrix.to }}
     runs-on: macos-15
+    strategy:
+      matrix:
+        include:
+          - { from: 5.5.1, to: 5.6.0 }
+          - { from: 5.6.0, to: 5.7.0 }
+          - { from: 5.7.0, to: 5.8.0 }
+          - { from: 5.8.0, to: 5.13.0 }
+
     steps:
       - uses: actions/checkout@v4
 
@@ -18,4 +27,13 @@ jobs:
             9.0.301
 
       - run: dotnet workload restore
-      - run: dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+
+      - name: ${{ matrix.from }}
+        run: |
+          dotnet add package Sentry.Maui --version "[${{ matrix.from }}]"
+          dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+
+      - name: ${{ matrix.to }}
+        run: |
+          dotnet add package Sentry.Maui --version "[${{ matrix.to }}]"
+          dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
