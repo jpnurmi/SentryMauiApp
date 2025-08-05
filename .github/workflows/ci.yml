@@ -10,5 +10,12 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.301
+
+      - run: dotnet workload restore
       - run: dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
