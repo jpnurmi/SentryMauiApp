@@ -2,13 +2,13 @@
 
 First, find the device id with:
 ```sh
-xcrun xctrace list devices
+$ xcrun xctrace list devices
 ```
 
 Then, do a clean build, and run the app with `Sentry.Maui` pinned at version `[5.5.1]`:
 ```sh
-dotnet clean -c Release
-dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=iossimulator-arm64 /p:_DeviceName=:v2:udid=<DeviceId>
+$ dotnet clean -c Release
+$ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=iossimulator-arm64 /p:_DeviceName=:v2:udid=<DeviceId>
 [...]
 [Sentry] [debug] [SentrySDK:209] Starting SDK...
 [...]
@@ -16,7 +16,7 @@ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=i
 
 Check Sentry Cocoa bundle version (expected 8.39.0):
 ```sh
-plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist | grep CFBundleVersion -A1
+$ plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist | $ grep CFBundleVersion -A1
 
         <key>CFBundleVersion</key>
         <string>8.39.0</string>
