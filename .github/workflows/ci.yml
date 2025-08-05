@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+      - run: dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
