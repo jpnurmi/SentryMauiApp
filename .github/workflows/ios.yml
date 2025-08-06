@@ -15,12 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.301
-
-      - run: dotnet workload restore
-
       - name: Cache ${{ matrix.version }}
         id: cache
         uses: actions/cache@v4
@@ -31,14 +25,13 @@ jobs:
           key: iossimulator-arm64-${{ matrix.version }}
 
       - name: Build ${{ matrix.version }}
+        uses: ./.github/actions/build-ios
         if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          dotnet add package Sentry.Maui --version "[${{ matrix.version }}]"
-          dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+        with:
+          version: ${{ matrix.version }}
 
-      - name: Check bundle versions
-        run: |
-          find . -name "Sentry-*.xcframework" -exec sh -c 'echo "$1"; plutil -convert xml1 -o - "$1/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist" | grep -A1 CFBundleVersion' _ {} \;
+      - name: Inspect ${{ matrix.version }}
+        uses: ./.github/actions/inspect-bundles
 
   upgrade:
     name: ${{ matrix.description }}
@@ -64,12 +57,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.301
-
-      - run: dotnet workload restore
-
       - name: Restore ${{ matrix.from }}
         id: cache
         uses: actions/cache@v4
@@ -80,16 +67,13 @@ jobs:
             obj
           key: iossimulator-arm64-${{ matrix.from }}
 
-      - name: Check cached bundle version
-        run: |
-          find . -name "Sentry-*.xcframework" -exec sh -c 'echo "$1"; plutil -convert xml1 -o - "$1/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist" | grep -A1 CFBundleVersion' _ {} \;
+      - name: Inspect ${{ matrix.from }}
+        uses: ./.github/actions/inspect-bundles
 
-      - name: Upgrade ${{ matrix.to }}
-        run: |
-          dotnet add package Sentry.Maui --version "[${{ matrix.to }}]"
-          dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+      - name: ${{ matrix.description }}
+        uses: ./.github/actions/build-ios
+        with:
+          version: ${{ matrix.to }}
 
-      - name: Check built bundle version
-        if: ${{ always() }}
-        run: |
-          find . -name "Sentry-*.xcframework" -exec sh -c 'echo "$1"; plutil -convert xml1 -o - "$1/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist" | grep -A1 CFBundleVersion' _ {} \;
+      - name: Inspect ${{ matrix.to }}
+        uses: ./.github/actions/inspect-bundles

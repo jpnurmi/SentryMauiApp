@@ -1,0 +1,25 @@
+name: Build for iOS
+description: ...
+
+inputs:
+  version:
+    description: The version of Sentry.Maui to build with
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.301
+
+    - shell: bash
+      run: |
+        dotnet workload restore
+
+    - if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        dotnet add package Sentry.Maui --version "[${{ inputs.version }}]"
+        dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64

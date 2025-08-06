@@ -1,0 +1,10 @@
+name: Inspect bundles
+description: ...
+
+runs:
+  using: composite
+
+  steps:
+    - shell: bash
+      run: |
+        find . -name "Sentry-*.xcframework" -exec sh -c 'echo "$1"; plutil -convert xml1 -o - "$1/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist" | grep -A1 CFBundleVersion' _ {} \;
