@@ -1,12 +1,10 @@
-name: CI
+name: iOS
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 jobs:
-  ios:
+  build:
     name: Sentry ${{ matrix.from }} -> ${{ matrix.to }}
     runs-on: macos-15
     strategy:
