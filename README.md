@@ -1,17 +1,12 @@
 # SentryMauiApp
 
-First, find the device id with:
-```sh
-$ xcrun xctrace list devices
-```
+A minimal Sentry .NET MAUI app for testing getsentry/sentry-dotnet#4411.
 
-Then, do a clean build, and run the app with `Sentry.Maui` pinned at version `[5.5.1]`:
+A clean build with `Sentry.Maui` pinned at version `[5.5.1]`:
 ```sh
 $ dotnet clean -c Release
-$ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=iossimulator-arm64 /p:_DeviceName=:v2:udid=<DeviceId>
-[...]
-[Sentry] [debug] [SentrySDK:209] Starting SDK...
-[...]
+$ dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+SentryMauiApp net9.0-ios18.0 succeeded (656.1s) → bin/Release/net9.0-ios18.0/iossimulator-arm64/SentryMauiApp.dll
 ```
 
 Check Sentry Cocoa bundle version (expected 8.39.0):
@@ -22,14 +17,10 @@ $ plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry
         <string>8.39.0</string>
 ```
 
-Next, upgrade `Sentry.Maui` to `[5.6.0]`:
+Rebuild with `Sentry.Maui` upgraded to version `[5.6.0]` (_without_ cleaning the intermediate output directory):
 ```sh
 $ dotnet add package Sentry.Maui --version "[5.6.0]"
-```
-
-Finally, try building and running the app _without cleaning_ the intermediate output directory:
-```sh
-$ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier=iossimulator-arm64 /p:_DeviceName=:v2:udid=<DeviceId>
+$ dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
 [...]
   SentryMauiApp net9.0-ios18.0 failed with 1 error(s) (652.1s) → bin/Release/net9.0-ios18.0/iossimulator-arm64/SentryMauiApp.dll
     /usr/local/share/dotnet/packs/Microsoft.iOS.Sdk.net9.0_18.0/18.0.9617/targets/Xamarin.Shared.Sdk.targets(1663,3): error :
@@ -41,11 +32,9 @@ $ dotnet build -c Release --framework net9.0-ios18.0 /t:Run /p:RuntimeIdentifier
             <initial-undefines>
       ld: symbol(s) not found for architecture arm64
       clang++: error: linker command failed with exit code 1 (use -v to see invocation)
-
-Build failed with 1 error(s) in 652.2s
 ```
 
-Also, check Sentry Cocoa bundle version (expected 8.46.0):
+Check Sentry Cocoa bundle version again (expected 8.46.0 but found stale 8.39.0):
 ```sh
 $ plutil -convert xml1 -o - obj/Release/net9.0-ios18.0/iossimulator-arm64/Sentry.Bindings.Cocoa.resources.zip/Sentry-Dynamic.xcframework/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist | grep CFBundleVersion -A1
 
