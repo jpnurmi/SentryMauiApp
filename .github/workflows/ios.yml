@@ -76,3 +76,8 @@ jobs:
         run: |
           dotnet add package Sentry.Maui --version "[${{ matrix.to }}]"
           dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+
+      - name: Check bundle versions
+        if: ${{ always() }}
+        run: |
+          find . -name "Sentry-*.xcframework" -exec sh -c 'echo "$1"; plutil -convert xml1 -o - "$1/ios-arm64_x86_64-simulator/Sentry.framework/Info.plist" | grep -A1 CFBundleVersion' _ {} \;
