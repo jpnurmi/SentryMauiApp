@@ -5,7 +5,42 @@ on:
 
 jobs:
   build:
-    name: Sentry ${{ matrix.from }} -> ${{ matrix.to }}
+    name: Build ${{ matrix.version }}
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [5.5.1, 5.6.0, 5.7.0, 5.8.0, 5.13.0, 5.14.0-alpha.0]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.301
+
+      - run: dotnet workload restore
+
+      - name: Cache ${{ matrix.version }}
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            bin
+            obj
+          key: iossimulator-arm64-${{ matrix.version }}
+
+      - name: Build ${{ matrix.version }}
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          dotnet add package Sentry.Maui --version "[${{ matrix.version }}]"
+          dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+
+  upgrade:
+    name: Upgrade ${{ matrix.from }} -> ${{ matrix.to }}
+    needs: build
     runs-on: macos-15
     strategy:
       fail-fast: false
@@ -31,12 +66,16 @@ jobs:
 
       - run: dotnet workload restore
 
-      - name: Build ${{ matrix.from }}
-        run: |
-          dotnet add package Sentry.Maui --version "[${{ matrix.from }}]"
-          dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
+      - name: Restore ${{ matrix.from }}
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            bin
+            obj
+          key: iossimulator-arm64-${{ matrix.from }}
 
-      - name: Build ${{ matrix.to }}
+      - name: Upgrade ${{ matrix.to }}
         run: |
           dotnet add package Sentry.Maui --version "[${{ matrix.to }}]"
           dotnet build -c Release -f net9.0-ios18.0 -r iossimulator-arm64
